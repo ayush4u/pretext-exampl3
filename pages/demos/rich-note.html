@@ -116,7 +116,7 @@
       vertical-align: baseline;
     }
     .frag--link {
-      color: var(--accent);
+      color: #b9aaff;
       text-decoration: underline;
       text-decoration-thickness: 1px;
       text-underline-offset: 0.14em;
@@ -124,10 +124,33 @@
     .frag--code {
       padding: 2px 7px 3px;
       border-radius: 9px;
-      background: rgba(17, 31, 43, 0.08);
+      background: rgba(138,116,255,0.12);
       font: 600 14px/1 "SF Mono", ui-monospace, Menlo, monospace;
       letter-spacing: 0;
     }
+    .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 28px;
+    padding: 7px 14px 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    font: 500 12px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--muted);
+    text-decoration: none;
+    transition: border-color var(--transition), color var(--transition), background var(--transition);
+  }
+  .back-link:hover {
+    border-color: var(--border-hover);
+    color: var(--ink);
+    background: var(--surface-hover);
+  }
+  .back-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
     .chip {
       display: inline-flex;
       align-items: center;
@@ -140,11 +163,11 @@
       vertical-align: baseline;
       transform: translateY(-1px);
     }
-    .chip--mention { background: rgba(21, 90, 136, 0.12); color: #155a88; border-color: rgba(21, 90, 136, 0.12); }
-    .chip--status { background: rgba(196, 129, 20, 0.12); color: #916207; border-color: rgba(196, 129, 20, 0.14); }
-    .chip--priority { background: rgba(176, 44, 44, 0.1); color: #8e2323; border-color: rgba(176, 44, 44, 0.14); }
-    .chip--time { background: rgba(70, 118, 77, 0.11); color: #355f38; border-color: rgba(70, 118, 77, 0.14); }
-    .chip--count { background: rgba(67, 57, 122, 0.1); color: #483e83; border-color: rgba(67, 57, 122, 0.13); }
+    .chip--mention { background: rgba(56,200,255,0.12); color: #38c8ff; border-color: rgba(56,200,255,0.2); }
+    .chip--status { background: rgba(255,200,56,0.1); color: #ffc838; border-color: rgba(255,200,56,0.18); }
+    .chip--priority { background: rgba(255,80,100,0.1); color: #ff5064; border-color: rgba(255,80,100,0.18); }
+    .chip--time { background: rgba(80,220,120,0.1); color: #50dc78; border-color: rgba(80,220,120,0.18); }
+    .chip--count { background: var(--accent-soft); color: var(--accent); border-color: rgba(138,116,255,0.22); }
     @media (max-width: 900px) {
       .preview {
         justify-content: center;
@@ -174,6 +197,10 @@
 </head>
 <body>
   <main class="page">
+    <a class="back-link" href="/demos">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M7.5 2.5L4 6l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      All demos
+    </a>
     <section class="intro">
       <p class="eyebrow">Demo</p>
       <h1>Rich Text</h1>

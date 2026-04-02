@@ -5,62 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pretext Demo — Accordion</title>
     <style>
-      * {
-        box-sizing: border-box;
-      }
+      *, *::before, *::after { box-sizing: border-box; }
 
       :root {
-        color-scheme: light;
-        --page: #f5f2ec;
-        --panel: #fffdf9;
-        --ink: #1e1a18;
-        --muted: #6e655f;
-        --rule: #d8cec3;
-        --accent: #955f3b;
+        --bg-0: #09090f;
+        --bg-1: #0f0f1a;
+        --surface: rgba(255,255,255,0.045);
+        --surface-hover: rgba(255,255,255,0.075);
+        --border: rgba(255,255,255,0.09);
+        --border-hover: rgba(138,116,255,0.45);
+        --ink: #f0eeff;
+        --muted: rgba(200,195,230,0.58);
+        --accent: #8a74ff;
+        --accent-soft: rgba(138,116,255,0.12);
+        --rule: rgba(255,255,255,0.08);
+        --radius: 18px;
+        --shadow: 0 4px 32px rgba(0,0,0,0.45);
+        --transition: 180ms cubic-bezier(.4,0,.2,1);
       }
+
+      html { scroll-behavior: smooth; }
 
       body {
         margin: 0;
-        background: var(--page);
+        min-height: 100vh;
+        background:
+          radial-gradient(ellipse 60% 35% at 15% -5%, rgba(138,116,255,0.14) 0%, transparent 65%),
+          radial-gradient(ellipse 50% 30% at 85% 100%, rgba(56,200,255,0.09) 0%, transparent 60%),
+          var(--bg-0);
+        background-attachment: fixed;
         color: var(--ink);
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
       }
 
       .page {
-        width: min(780px, calc(100vw - 32px));
+        width: min(780px, calc(100vw - 48px));
         margin: 0 auto;
-        padding: 32px 0 48px;
+        padding: 32px 0 64px;
       }
 
-      .intro {
-        margin-bottom: 20px;
+      /* back nav */
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 32px;
+        padding: 7px 14px 7px 10px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface);
+        font: 500 12px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: var(--muted);
+        text-decoration: none;
+        transition: border-color var(--transition), color var(--transition), background var(--transition);
       }
+
+      .back-link:hover {
+        border-color: var(--border-hover);
+        color: var(--ink);
+        background: var(--surface-hover);
+      }
+
+      .back-link:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      /* header */
+      .intro { margin-bottom: 28px; }
 
       .eyebrow {
-        margin: 0 0 8px;
-        font: 12px/1.2 "SF Mono", ui-monospace, monospace;
-        letter-spacing: 0.08em;
+        margin: 0 0 10px;
+        font: 600 11px/1 "SF Mono", ui-monospace, monospace;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
         color: var(--accent);
       }
 
       h1 {
         margin: 0;
-        font: 700 30px/1.08 Georgia, "Times New Roman", serif;
+        font: 800 clamp(28px, 5vw, 38px)/1.08 "Helvetica Neue", Helvetica, Arial, sans-serif;
+        letter-spacing: -0.025em;
+        background: linear-gradient(120deg, #fff 0%, #d4caff 50%, #38c8ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
 
       .intro p {
-        margin: 10px 0 0;
-        max-width: 58ch;
-        line-height: 1.45;
+        margin: 12px 0 0;
+        max-width: 54ch;
+        font: 400 15px/1.6 "Helvetica Neue", Helvetica, Arial, sans-serif;
         color: var(--muted);
       }
 
+      /* accordion */
       .stack {
-        border: 1px solid var(--rule);
-        border-radius: 18px;
-        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         overflow: hidden;
+        box-shadow: var(--shadow);
       }
 
       .accordion-item + .accordion-item {
@@ -73,41 +121,52 @@
         gap: 14px;
         align-items: center;
         width: 100%;
-        padding: 18px 20px;
+        padding: 20px 22px;
         border: 0;
         background: transparent;
         color: inherit;
         text-align: left;
         cursor: pointer;
+        transition: background var(--transition);
       }
 
       .accordion-toggle:hover {
-        background: rgb(0 0 0 / 0.02);
+        background: var(--surface-hover);
       }
 
-      .accordion-heading {
-        min-width: 0;
+      .accordion-toggle:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: -2px;
       }
+
+      .accordion-heading { min-width: 0; }
 
       .accordion-title {
         display: block;
-        font: 600 17px/1.2 "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font: 600 16px/1.25 "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: var(--ink);
       }
 
       .accordion-meta {
         justify-self: end;
-        font: 12px/1.2 "SF Mono", ui-monospace, monospace;
+        font: 500 11px/1 "SF Mono", ui-monospace, monospace;
         color: var(--muted);
         white-space: nowrap;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        letter-spacing: 0.04em;
       }
 
       .accordion-glyph {
         display: grid;
         place-items: center;
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         color: var(--accent);
-        transition: transform 180ms ease;
+        transition: transform 240ms cubic-bezier(.4,0,.2,1);
+        flex-shrink: 0;
       }
 
       .accordion-glyph::before {
@@ -122,44 +181,59 @@
       .accordion-body {
         height: 0;
         overflow: clip;
-        transition: height 180ms ease;
+        transition: height 240ms cubic-bezier(.4,0,.2,1);
       }
 
       .accordion-inner {
-        padding: 0 20px 18px;
+        padding: 4px 22px 20px;
+        border-top: 1px solid var(--rule);
       }
 
       .accordion-copy {
         margin: 0;
-        font: 16px/26px "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color: var(--ink);
+        font: 400 15px/1.65 "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: var(--muted);
       }
 
       @media (prefers-reduced-motion: reduce) {
         .accordion-glyph,
-        .accordion-body {
+        .accordion-body,
+        .back-link,
+        .accordion-toggle {
           transition: none;
         }
       }
 
-      @media (max-width: 640px) {
+      @media (max-width: 600px) {
         .page {
-          width: min(100vw - 20px, 780px);
-          padding-top: 22px;
+          width: calc(100vw - 32px);
+          padding-top: 24px;
         }
 
         .accordion-toggle {
           gap: 10px;
+          padding: 16px 16px;
+        }
+
+        .accordion-inner {
+          padding-inline: 16px;
         }
 
         .accordion-meta {
-          font-size: 11px;
+          font-size: 10px;
         }
       }
     </style>
   </head>
   <body>
     <main class="page">
+      <a class="back-link" href="/demos">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M7.5 2.5L4 6l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        All demos
+      </a>
+
       <section class="intro">
         <p class="eyebrow">Demo</p>
         <h1>Finally sane accordion</h1>
