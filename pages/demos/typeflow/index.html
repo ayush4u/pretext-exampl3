@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Typeflow: kinetic typography powered by Pretext — stagger animations, live reflow, and per-line width visualisation without DOM measurement.">
+  <title>Typeflow — Kinetic Typography · Pretext Demo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #070711;
+      --text:    #f0ece4;
+      --muted:   rgba(240, 236, 228, 0.38);
+      --accent:  #c8a96e;
+      --accent2: #7b9fd4;
+      --rule:    rgba(200, 169, 110, 0.18);
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    /* ── Canvas particle background ─────────────────────────── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Main stage ─────────────────────────────────────────── */
+    #stage {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      /* top/bottom bars eat 60px each */
+      padding: 68px 0;
+    }
+
+    /* ── Quote area ─────────────────────────────────────────── */
+    #quote-wrapper {
+      position: relative;
+      width: min(700px, calc(100vw - 64px));
+    }
+
+    #lines-container {
+      position: relative;
+      transition: height 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    /* Each rendered line */
+    .line-row {
+      position: absolute;
+      left: 0;
+      right: 0;
+      will-change: transform, opacity;
+    }
+
+    .line-text {
+      display: block;
+      white-space: nowrap;
+      line-height: 1.42;
+    }
+
+    /* Width-fill bar under each line */
+    .line-bar {
+      display: block;
+      height: 2px;
+      border-radius: 1px;
+      margin-top: 3px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      transform-origin: left;
+      opacity: 0.45;
+      transition: transform 380ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                  opacity  380ms ease;
+    }
+
+    /* Attribution line */
+    #attribution {
+      margin-top: 28px;
+      font-style: italic;
+      color: var(--muted);
+      text-align: right;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 400ms 180ms ease, transform 400ms 180ms ease;
+      user-select: text;
+    }
+
+    #attribution.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Progress bar (auto-advance timer) ───────────────────── */
+    #progress-track {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.06);
+      z-index: 10;
+    }
+
+    #progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width linear;
+    }
+
+    /* ── Top bar ─────────────────────────────────────────────── */
+    #top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: linear-gradient(to bottom, rgba(7,7,17,0.9) 0%, transparent 100%);
+      z-index: 10;
+    }
+
+    #badge {
+      font: 700 11px/1 "SF Mono", ui-monospace, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    #hint {
+      font: 11px/1 "SF Mono", ui-monospace, monospace;
+      color: rgba(255, 255, 255, 0.16);
+      pointer-events: none;
+    }
+
+    /* ── Bottom bar ──────────────────────────────────────────── */
+    #bottom-bar {
+      position: fixed;
+      bottom: 2px; /* sit above progress bar */
+      left: 0;
+      right: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: linear-gradient(to top, rgba(7,7,17,0.9) 0%, transparent 100%);
+      z-index: 10;
+    }
+
+    /* Stats */
+    #stats {
+      font: 12px/1 "SF Mono", ui-monospace, monospace;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    #stats em { color: var(--accent); font-style: normal; }
+
+    /* Nav dots */
+    #nav-dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.18);
+      cursor: pointer;
+      transition: background 200ms, transform 200ms;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      transform: scale(1.45);
+    }
+
+    .dot:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.38);
+    }
+
+    /* Font size control */
+    #controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font: 12px/1 "SF Mono", ui-monospace, monospace;
+      color: var(--muted);
+    }
+
+    #font-slider {
+      -webkit-appearance: none;
+      width: 88px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.14);
+      outline: none;
+      cursor: pointer;
+    }
+
+    #font-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(200, 169, 110, 0.55);
+    }
+
+    #font-slider::-moz-range-thumb {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+    }
+
+    #font-size-val { color: var(--accent); }
+
+    /* ── Pause indicator ─────────────────────────────────────── */
+    #pause-icon {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 20;
+      font-size: 64px;
+      transition: opacity 200ms, transform 200ms;
+    }
+
+    #pause-icon.show {
+      opacity: 0.35;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 520px) {
+      #hint    { display: none; }
+      #stats   { font-size: 10px; }
+      #controls { gap: 6px; }
+      #font-slider { width: 64px; }
+    }
+
+    /* ── Accessible visually-hidden utility ─────────────────── */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .line-row, #attribution, #progress-fill, #lines-container {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+
+  <div id="stage">
+    <div id="quote-wrapper">
+      <div id="lines-container"></div>
+      <div id="attribution"></div>
+    </div>
+  </div>
+
+  <div id="top-bar">
+    <div id="badge">Pretext</div>
+    <div id="hint">← → navigate · space pause · drag slider to reflow</div>
+  </div>
+
+  <div id="bottom-bar">
+    <div id="stats">
+      Lines: <em id="stat-lines">—</em>&ensp;·&ensp;Layout: <em id="stat-time">—</em>&thinsp;µs&ensp;·&ensp;Width: <em id="stat-width">—</em>&thinsp;px
+    </div>
+    <div id="nav-dots" role="tablist" aria-label="Quote navigation"></div>
+    <div id="controls">
+      <span>Aa</span>
+      <input type="range" id="font-slider" min="16" max="60" value="34">
+      <span id="font-size-val">34px</span>
+    </div>
+  </div>
+
+  <div id="progress-track"><div id="progress-fill" style="width:0%"></div></div>
+  <div id="pause-icon" aria-hidden="true">⏸</div>
+  <div id="pause-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="./index.ts"></script>
+</body>
+</html>
