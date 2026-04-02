@@ -1,26 +1,76 @@
 <!DOCTYPE html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-
+<html lang="en">
+<head>
+<title>Pretext Demo — Masonry</title>
+</head>
 <body>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      background: #f0f0f0;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(ellipse 60% 35% at 15% -5%, rgba(138,116,255,0.14) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 30% at 88% 108%, rgba(56,200,255,0.1) 0%, transparent 60%),
+        #09090f;
+      background-attachment: fixed;
       overflow-y: scroll;
+      -webkit-font-smoothing: antialiased;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 100;
+      padding: 7px 14px 7px 10px;
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.045);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font: 500 12px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: rgba(200,195,230,0.58);
+      text-decoration: none;
+      transition: border-color 180ms ease, color 180ms ease;
+    }
+    .back-link:hover {
+      border-color: rgba(138,116,255,0.45);
+      color: #f0eeff;
+    }
+    .back-link:focus-visible {
+      outline: 2px solid #8a74ff;
+      outline-offset: 3px;
     }
     .card {
       position: absolute;
-      background: white;
-      border-radius: 8px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
       padding: 16px;
       font-size: 15px;
       line-height: 22px;
-      color: #333;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      color: rgba(200,195,230,0.82);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
       overflow: hidden;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+    .card:hover {
+      border-color: rgba(138,116,255,0.3);
+      box-shadow: 0 8px 32px rgba(138,116,255,0.12), 0 4px 16px rgba(0,0,0,0.5);
     }
   </style>
+  <a class="back-link" href="/demos">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M7.5 2.5L4 6l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    All demos
+  </a>
   <script type="module" src="./index.ts"></script>
 </body>
+</html>
