@@ -1,26 +1,96 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Pretext Demo — Masonry</title>
 
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg-0: #07060d;
+    --bg-1: #0d0b1a;
+    --bg-2: #15122a;
+    --border: rgba(255, 255, 255, 0.08);
+    --ink: #f0ecff;
+    --muted: rgba(240, 236, 255, 0.52);
+    --accent: #7c6fff;
+  }
+  html, body { min-height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background:
+      radial-gradient(ellipse 140% 60% at 50% -10%, var(--bg-2) 0%, transparent 70%),
+      var(--bg-0);
+    color: var(--ink);
+    overflow-y: scroll;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Back nav */
+  .demo-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(7, 6, 13, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .demo-nav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font: 600 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--accent);
+    text-decoration: none;
+    transition: background 160ms ease;
+  }
+  .demo-nav-back:hover { background: rgba(124, 111, 255, 0.12); }
+  .demo-nav-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .demo-nav-sep { color: var(--muted); font-size: 14px; }
+  .demo-nav-title {
+    font: 600 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--muted);
+  }
+
+  .card {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 15px;
+    line-height: 22px;
+    color: var(--ink);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+  .card:hover {
+    border-color: rgba(124, 111, 255, 0.35);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(124, 111, 255, 0.15);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .demo-nav-back, .card { transition: none; }
+  }
+</style>
+</head>
 <body>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      background: #f0f0f0;
-      overflow-y: scroll;
-    }
-    .card {
-      position: absolute;
-      background: white;
-      border-radius: 8px;
-      padding: 16px;
-      font-size: 15px;
-      line-height: 22px;
-      color: #333;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      overflow: hidden;
-    }
-  </style>
+  <nav class="demo-nav" aria-label="Site navigation">
+    <a href="/demos" class="demo-nav-back"><span aria-hidden="true">←</span> Demos</a>
+    <span class="demo-nav-sep" aria-hidden="true">/</span>
+    <span class="demo-nav-title">Masonry</span>
+  </nav>
   <script type="module" src="./index.ts"></script>
 </body>
+</html>

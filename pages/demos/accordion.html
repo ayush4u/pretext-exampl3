@@ -5,62 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pretext Demo — Accordion</title>
     <style>
-      * {
+      *, *::before, *::after {
         box-sizing: border-box;
       }
 
       :root {
-        color-scheme: light;
-        --page: #f5f2ec;
-        --panel: #fffdf9;
-        --ink: #1e1a18;
-        --muted: #6e655f;
-        --rule: #d8cec3;
-        --accent: #955f3b;
+        --bg-0: #07060d;
+        --bg-1: #0d0b1a;
+        --bg-2: #15122a;
+        --glass: rgba(255, 255, 255, 0.04);
+        --border: rgba(255, 255, 255, 0.08);
+        --ink: #f0ecff;
+        --muted: rgba(240, 236, 255, 0.52);
+        --accent: #7c6fff;
+        --accent-glow: rgba(124, 111, 255, 0.25);
+        --rule: rgba(255, 255, 255, 0.08);
+        --panel: rgba(255, 255, 255, 0.04);
       }
 
       body {
         margin: 0;
-        background: var(--page);
+        min-height: 100vh;
+        background:
+          radial-gradient(ellipse 140% 60% at 50% -10%, var(--bg-2) 0%, transparent 70%),
+          var(--bg-0);
         color: var(--ink);
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Back nav */
+      .demo-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(7, 6, 13, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .demo-nav-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font: 600 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        color: var(--accent);
+        text-decoration: none;
+        transition: background 160ms ease;
+      }
+      .demo-nav-back:hover { background: rgba(124, 111, 255, 0.12); }
+      .demo-nav-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+      .demo-nav-sep { color: var(--muted); font-size: 14px; }
+      .demo-nav-title {
+        font: 600 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        color: var(--muted);
       }
 
       .page {
         width: min(780px, calc(100vw - 32px));
         margin: 0 auto;
-        padding: 32px 0 48px;
+        padding: 36px 0 56px;
+        animation: fadeUp 0.55s ease both;
       }
 
       .intro {
-        margin-bottom: 20px;
+        margin-bottom: 28px;
       }
 
       .eyebrow {
-        margin: 0 0 8px;
-        font: 12px/1.2 "SF Mono", ui-monospace, monospace;
-        letter-spacing: 0.08em;
+        margin: 0 0 10px;
+        font: 600 11px/1 "SF Mono", ui-monospace, monospace;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
         color: var(--accent);
       }
 
       h1 {
         margin: 0;
-        font: 700 30px/1.08 Georgia, "Times New Roman", serif;
+        font: 800 30px/1.08 -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        letter-spacing: -0.025em;
       }
 
       .intro p {
         margin: 10px 0 0;
         max-width: 58ch;
-        line-height: 1.45;
+        line-height: 1.55;
         color: var(--muted);
       }
 
       .stack {
-        border: 1px solid var(--rule);
+        border: 1px solid var(--border);
         border-radius: 18px;
         background: var(--panel);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       }
 
       .accordion-item + .accordion-item {
@@ -79,10 +125,11 @@
         color: inherit;
         text-align: left;
         cursor: pointer;
+        transition: background 160ms ease;
       }
 
       .accordion-toggle:hover {
-        background: rgb(0 0 0 / 0.02);
+        background: rgba(124, 111, 255, 0.06);
       }
 
       .accordion-heading {
@@ -91,7 +138,7 @@
 
       .accordion-title {
         display: block;
-        font: 600 17px/1.2 "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font: 600 17px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
       }
 
       .accordion-meta {
@@ -131,11 +178,18 @@
 
       .accordion-copy {
         margin: 0;
-        font: 16px/26px "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font: 16px/26px -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
         color: var(--ink);
       }
 
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
       @media (prefers-reduced-motion: reduce) {
+        .page { animation: none; }
+        .accordion-toggle { transition: none; }
         .accordion-glyph,
         .accordion-body {
           transition: none;
@@ -145,7 +199,7 @@
       @media (max-width: 640px) {
         .page {
           width: min(100vw - 20px, 780px);
-          padding-top: 22px;
+          padding-top: 24px;
         }
 
         .accordion-toggle {
@@ -159,6 +213,11 @@
     </style>
   </head>
   <body>
+    <nav class="demo-nav" aria-label="Site navigation">
+      <a href="/demos" class="demo-nav-back"><span aria-hidden="true">←</span> Demos</a>
+      <span class="demo-nav-sep" aria-hidden="true">/</span>
+      <span class="demo-nav-title">Accordion</span>
+    </nav>
     <main class="page">
       <section class="intro">
         <p class="eyebrow">Demo</p>
